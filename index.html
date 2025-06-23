@@ -7,8 +7,8 @@
 # in the calling context.
 
 # Sangat cepat rata-rata 24 ms.
-## 📝 Changelog - v2.2.22 (2025-06-23)
-### Patch v2.2.22
+## 📝 Changelog - v2.2.24 (2025-06-23)
+### Patch v2.2.24
 # Bug fixeds
   
 # - Finished monitoring anomaly case file lang
@@ -49,30 +49,39 @@ if [[ $# -eq 0 ]]; then
   touch ~/.local/state/wuo/lang.default; 
   lang="default" #en # Agar eksekusi cepat
 fi
+
 for arg in "$@"; do
   case "$arg" in
     --debug)
       DEBUG=1
-      lang="default" # Harus
-      touch ~/.local/state/wuo/lang.default;
-      shift
       ;;
     --lang=*)
       LANG_ARG="${arg#--lang=}"
-      if [[ "$LANG_ARG" == "auto" ]]; then
-         termux-tts-engines | yq -o t | cut -f1,3 --complement | xargs | awk '{print $2}' > ~/.local/state/wuo/lang; 
-         touch ~/.local/state/wuo/lang.auto; 
-         lang="auto"
-      elif [[ "$LANG_ARG" == "id" ]]; then  
-           echo "Pengenalan" > ~/.local/state/wuo/lang; lang="id"
-      elif [[ "$LANG_ARG" == "en" ]]; then 
-           echo "Speech" > ~/.local/state/wuo/lang; lang="en"
-      else echo "undefined"; exit 3; fi
-        shift
       ;;
   esac
 done
 
+# Atur lang setelah parsing
+if [[ "$LANG_ARG" == "auto" ]]; then
+  termux-tts-engines | yq -o t | cut -f1,3 --complement | xargs | awk '{print $2}' > "$CACHE"
+  touch "$STATE"
+  lang="auto"
+elif [[ "$LANG_ARG" == "id" ]]; then
+  echo "Pengenalan" > "$CACHE"
+  lang="id"
+elif [[ "$LANG_ARG" == "en" ]]; then
+  echo "Speech" > "$CACHE"
+  lang="en"
+elif [[ -n "$LANG_ARG" ]]; then
+  echo "undefined"
+  exit 3
+fi
+
+# Jika lang tidak ditentukan tapi debug aktif, fallback
+if [[ -z "$lang" && $DEBUG -eq 1 ]]; then
+  lang="default"
+  touch "$BASE/lang.default"
+fi
   
 
 if [[ -z "$lang" && -w "$STATE" && -w "${BASE}/lang.default" ]]; then 
