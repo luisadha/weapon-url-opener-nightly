@@ -52,6 +52,7 @@ for arg in "$@"; do
     --debug)
       DEBUG=1
       shift
+      lang="default"
       ;;
     --lang=*)
       LANG_ARG="${arg#--lang=}"
@@ -78,6 +79,8 @@ debug_log "Detection language: $lang\n"
 
 if [ ! -f "$STATE" ]; then
   debug_log "Detection language: auto\n"
+else
+  debug_log "Detection language: default\n"
 fi 
 
 
@@ -113,7 +116,7 @@ trmap() {
     Speech)     lang="en" ;;
     *)          lang="en" ;;  # fallback default
    esac
-debug_log "Query detected: ${locale:-}\n"
+debug_log "Query detected: ${locale:+"(system default)"}\n"
 
   case "$lang" in
     id) echo "${map_id[$1]}" ;;
