@@ -86,6 +86,7 @@ done
         elif [[ -f "${BASE}/lang.default" ]]; then
                 lang="default";
         fi
+        continue
         ;;
   esac
   
@@ -123,7 +124,7 @@ trmap() {
     Speech)     lang="en" ;;
     *)          lang="en" ;;  # fallback default
    esac
-debug_log "Query detected: ${locale:="(system default)"}\n"
+debug_log "Query detected: ${locale:="(system detection)"}\n"
 
   case "$lang" in
     id) echo "${map_id[$1]}" ;;
