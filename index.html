@@ -71,20 +71,22 @@ for arg in "$@"; do
   esac
 done
 
-  if [[ -f "$STATE" ]]; then
-    #lang="auto" # Hanya digunakan di opsi --lang=auto
-    echo "Auto" | tee "$CACHE"
-  fi
+  
+  #  lang="auto" # Hanya digunakan di opsi --lang=auto
+ # fi
   
   case "$(cat "$CACHE")" in
     Pengenalan) 
                 lang="id" ;;
     Speech)     
                 lang="en" ;;
-    Auto)
-                lang="auto" ;;
-    "")         
-                lang="default" ;;
+    "")
+        if [[ -f "$STATE" ]]; then
+                lang="auto";
+        elif [[ -f "${BASE}/lang.default" ]]; then
+                lang="default";
+        fi
+        ;;
   esac
   
 debug_log "Detection language: $lang\n"
