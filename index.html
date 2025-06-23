@@ -44,8 +44,7 @@ normal_log() {
 
 # 🔍 Deteksi opsi
 if [[ $# -eq 0 ]]; then
-  touch ~/.local/state/wuo/lang.auto;
-  lang="auto"
+  termux-tts-engines | yq -o t | cut -f1,3 --complement | xargs | awk '{print $2}' > ~/.local/state/wuo/lang; touch ~/.local/state/wuo/lang.auto; lang="auto"
 fi
 for arg in "$@"; do
   case $arg in
@@ -53,7 +52,7 @@ for arg in "$@"; do
       DEBUG=1
       shift
       lang="default"
-      touch ~/.local/state/wuo/lang.auto;
+      touch ~/.local/state/wuo/lang.default;
       ;;
     --lang=*)
       LANG_ARG="${arg#--lang=}"
