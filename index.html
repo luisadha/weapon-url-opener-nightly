@@ -74,24 +74,18 @@ done
   
   #  lang="auto" # Hanya digunakan di opsi --lang=auto
  # fi
-  
+if [[ -z "$lang" && -w "$STATE" && -w "${BASE}/lang.default" ]]; then 
   case "$(cat "$CACHE")" in
     Pengenalan) 
                 lang="id" ;;
     Speech)     
                 lang="en" ;;
     "")
-        if [[ -f "$STATE" ]]; then
-                lang="auto";
-        elif [[ -f "${BASE}/lang.default" ]]; then
-                lang="default";
-        fi
-        continue
-        ;;
+                lang="" ;;
   esac
   
 debug_log "Detection language: $lang\n"
-
+fi
 # Map Bahasa Indonesia
 declare -A map_id=(
   [choosed_n]='Tidak memilih'
