@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Sangat cepat rata-rata 24 ms.
-## 📝 Changelog - vX.Y.Z (2025-06-23)
+## 📝 Changelog - v2.2.5 (2025-06-23)
 
 ### ✨ New Features
 # - Revamped the UI for a more intuitive and cleaner experience.
@@ -146,7 +146,7 @@ if [[ -n "$toggle" ]]; then
   fzf_header="$__banner__"
   current="$toggle"
 else
-  fzf_header=""
+  fzf_header="$__banner__"
   current="$toggle"
 fi
 # Cache biar cepat
@@ -179,7 +179,8 @@ weapon=$(printf '%s\n' "${file_list[@]}" | while read -r f; do
   --input-label="[ $inuse $current ]"\
   --highlight-line \
   --preview='bat --color=always --style=plain --paging=never --theme OneHalfDark {1}' \
-  --with-nth=2 --delimiter=$'\t' \
+  --with-nth=2 \
+  --delimiter=$'\t' \
   --exit-0 | cut -f1) 
 
 # Jika tidak memilih apa-apa, keluar
