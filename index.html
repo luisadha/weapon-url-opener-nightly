@@ -7,8 +7,8 @@
 # in the calling context.
 
 # Sangat cepat rata-rata 24 ms.
-## 📝 Changelog - v2.2.21 (2025-06-23)
-### Patch v2.2.21
+## 📝 Changelog - v2.2.22 (2025-06-23)
+### Patch v2.2.22
 # Bug fixeds
   
 # - Finished monitoring anomaly case file lang
@@ -53,9 +53,9 @@ for arg in "$@"; do
   case $arg in
     --debug)
       DEBUG=1
-      shift
       lang="default" # Harus
       touch ~/.local/state/wuo/lang.default;
+      shift
       ;;
     --lang=*)
       LANG_ARG="${arg#--lang=}"
