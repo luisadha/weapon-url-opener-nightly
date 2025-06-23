@@ -52,7 +52,7 @@ for arg in "$@"; do
     --debug)
       DEBUG=1
       shift
-      lang="" # Harus selalu nilai null
+      lang="default" # Harus
       touch ~/.local/state/wuo/lang.default;
       ;;
     --lang=*)
@@ -72,8 +72,7 @@ for arg in "$@"; do
 done
 
   
-  #  lang="auto" # Hanya digunakan di opsi --lang=auto
- # fi
+
 if [[ -z "$lang" && -w "$STATE" && -w "${BASE}/lang.default" ]]; then 
   case "$(cat "$CACHE")" in
     Pengenalan) 
@@ -83,9 +82,9 @@ if [[ -z "$lang" && -w "$STATE" && -w "${BASE}/lang.default" ]]; then
     "")
                 lang="" ;;
   esac
-  
-debug_log "Detection language: $lang\n"
 fi
+debug_log "Detection language: $lang\n"
+
 # Map Bahasa Indonesia
 declare -A map_id=(
   [choosed_n]='Tidak memilih'
