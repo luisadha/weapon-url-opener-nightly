@@ -44,7 +44,8 @@ normal_log() {
 
 # 🔍 Deteksi opsi
 if [[ $# -eq 0 ]]; then
-  termux-tts-engines | yq -o t | cut -f1,3 --complement | xargs | awk '{print $2}' > ~/.local/state/wuo/lang; touch ~/.local/state/wuo/lang.auto; lang="auto"
+  touch ~/.local/state/wuo/lang.default; 
+  lang="default" #en # Agar eksekusi cepat
 fi
 for arg in "$@"; do
   case $arg in
@@ -68,21 +69,20 @@ for arg in "$@"; do
   esac
 done
 
-if [[ -z "$lang" && -f "$CACHE" && ! -f "$STATE" ]]; then
+  if [[ -f "$STATE" ]]; then
+    lang="auto" # Hanya digunakan di opsi --lang=auto
+  fi
+  
   case "$(cat "$CACHE")" in
-    Pengenalan) lang="id" ;;
-    Speech)     lang="en" ;;
-    "")         lang="default" ;;
+    Pengenalan) 
+                lang="id" ;;
+    Speech)     
+                lang="en" ;;
+    "")         
+                lang="default" ;;
   esac
-fi
+  
 debug_log "Detection language: $lang\n"
-
-if [ -f "$STATE" ]; then
-  debug_log "Detection language: auto\n"
-else
-  debug_log "Detection language: default\n"
-fi 
-
 
 # Map Bahasa Indonesia
 declare -A map_id=(
