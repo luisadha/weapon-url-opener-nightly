@@ -52,13 +52,15 @@ for arg in "$@"; do
     --debug)
       DEBUG=1
       shift
-      lang="default"
+      lang="" # Harus selalu nilai null
       touch ~/.local/state/wuo/lang.default;
       ;;
     --lang=*)
       LANG_ARG="${arg#--lang=}"
       if [[ "$LANG_ARG" == "auto" ]]; then
-         termux-tts-engines | yq -o t | cut -f1,3 --complement | xargs | awk '{print $2}' > ~/.local/state/wuo/lang; touch ~/.local/state/wuo/lang.auto; lang="auto"
+         termux-tts-engines | yq -o t | cut -f1,3 --complement | xargs | awk '{print $2}' > ~/.local/state/wuo/lang; 
+         touch ~/.local/state/wuo/lang.auto; 
+         lang="auto"
       elif [[ "$LANG_ARG" == "id" ]]; then  
            echo "Pengenalan" > ~/.local/state/wuo/lang; lang="id"
       elif [[ "$LANG_ARG" == "en" ]]; then 
@@ -70,7 +72,8 @@ for arg in "$@"; do
 done
 
   if [[ -f "$STATE" ]]; then
-    lang="auto" # Hanya digunakan di opsi --lang=auto
+    #lang="auto" # Hanya digunakan di opsi --lang=auto
+    echo "Auto" | tee "$CACHE"
   fi
   
   case "$(cat "$CACHE")" in
@@ -78,6 +81,8 @@ done
                 lang="id" ;;
     Speech)     
                 lang="en" ;;
+    Auto)
+                lang="auto" ;;
     "")         
                 lang="default" ;;
   esac
@@ -123,7 +128,7 @@ debug_log "Query detected: ${locale:="(system default)"}\n"
     en) echo "${map_en[$1]}" ;;
     *) echo "Unknown language" ;;
   esac
-  debug_log "Mapped language: $lang (default)\n"
+  debug_log "Mapped language: $lang\n"
 }
 
 # Masuk ke folder koleksi
