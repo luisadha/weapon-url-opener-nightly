@@ -53,6 +53,7 @@ for arg in "$@"; do
       DEBUG=1
       shift
       lang="default"
+      touch ~/.local/state/wuo/lang.auto;
       ;;
     --lang=*)
       LANG_ARG="${arg#--lang=}"
@@ -116,7 +117,7 @@ trmap() {
     Speech)     lang="en" ;;
     *)          lang="en" ;;  # fallback default
    esac
-debug_log "Query detected: ${locale:+"(system default)"}\n"
+debug_log "Query detected: ${locale:="(system default)"}\n"
 
   case "$lang" in
     id) echo "${map_id[$1]}" ;;
