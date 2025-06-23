@@ -45,7 +45,7 @@ normal_log() {
 # 🔍 Deteksi opsi
 if [[ $# -eq 0 ]]; then
   touch ~/.local/state/wuo/lang.auto;
-  lang="default"
+  lang="auto"
 fi
 for arg in "$@"; do
   case $arg in
@@ -78,7 +78,7 @@ if [[ -z "$lang" && -f "$CACHE" && ! -f "$STATE" ]]; then
 fi
 debug_log "Detection language: $lang\n"
 
-if [ ! -f "$STATE" ]; then
+if [ -f "$STATE" ]; then
   debug_log "Detection language: auto\n"
 else
   debug_log "Detection language: default\n"
