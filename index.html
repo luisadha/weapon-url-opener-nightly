@@ -7,7 +7,10 @@
 # in the calling context.
 
 # Sangat cepat rata-rata 24 ms.
-## 📝 Changelog - v2.2.7 (2025-06-23)
+## 📝 Changelog - v2.2.8 (2025-06-23)
+### Patch v2.2.8
+# - Fix bug when missing files lang.auto
+# - Unfinish monitoring file lang
 
 ### ✨ New Features
 # - Revamped the UI for a more intuitive and cleaner experience.
@@ -23,6 +26,7 @@ lang=""
 BASE="$HOME/.local/state/wuo/"
 CACHE="$HOME/.local/state/wuo/lang"
 STATE="$HOME/.local/state/wuo/lang.auto"
+touch "$CACHE"
 mkdir -p "$BASE"
 debug_log() {  
   if [ "$DEBUG" -eq 1 ]; then  
@@ -38,6 +42,7 @@ normal_log() {
 
 # 🔍 Deteksi opsi
 if [[ $# -eq 0 ]]; then
+  touch ~/.local/state/wuo/lang.auto;
   lang="auto"
 fi
 for arg in "$@"; do
@@ -64,6 +69,7 @@ if [[ -z "$lang" && -f "$CACHE" && ! -f "$STATE" ]]; then
   case "$(cat "$CACHE")" in
     Pengenalan) lang="id" ;;
     Speech)     lang="en" ;;
+    
   esac
 fi
 debug_log "Detection language: $lang\n"
