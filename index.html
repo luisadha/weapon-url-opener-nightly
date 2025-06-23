@@ -111,7 +111,7 @@ trmap() {
   case "$locale" in
     Pengenalan) lang="id" ;;
     Speech)     lang="en" ;;
-    *)          lang="en (default)" ;;  # fallback default
+    *)          lang="en" ;;  # fallback default
    esac
 debug_log "Query detected: ${locale:-}\n"
 
@@ -120,7 +120,7 @@ debug_log "Query detected: ${locale:-}\n"
     en) echo "${map_en[$1]}" ;;
     *) echo "Unknown language" ;;
   esac
-  debug_log "Mapped language: $lang\n"
+  debug_log "Mapped language: $lang (default)\n"
 }
 
 # Masuk ke folder koleksi
