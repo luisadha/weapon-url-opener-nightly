@@ -7,7 +7,9 @@
 # in the calling context.
 
 # Sangat cepat rata-rata 24 ms.
-## 📝 Changelog - v2.2.8 (2025-06-23)
+## 📝 Changelog - v2.2.9 (2025-06-23)
+### Patch v2.2.9
+# - Finished monitoring anomaly case file lang
 ### Patch v2.2.8
 # - Fix bug when missing files lang.auto
 # - Unfinish monitoring file lang
@@ -43,7 +45,7 @@ normal_log() {
 # 🔍 Deteksi opsi
 if [[ $# -eq 0 ]]; then
   touch ~/.local/state/wuo/lang.auto;
-  lang="auto"
+  lang="default"
 fi
 for arg in "$@"; do
   case $arg in
@@ -69,7 +71,7 @@ if [[ -z "$lang" && -f "$CACHE" && ! -f "$STATE" ]]; then
   case "$(cat "$CACHE")" in
     Pengenalan) lang="id" ;;
     Speech)     lang="en" ;;
-    
+    "")         lang="default" ;;
   esac
 fi
 debug_log "Detection language: $lang\n"
@@ -109,9 +111,9 @@ trmap() {
   case "$locale" in
     Pengenalan) lang="id" ;;
     Speech)     lang="en" ;;
-    *)          lang="en" ;;  # fallback default
+    *)          lang="en (default)" ;;  # fallback default
    esac
-debug_log "Query detected: $locale\n"
+debug_log "Query detected: ${locale:-}\n"
 
   case "$lang" in
     id) echo "${map_id[$1]}" ;;
