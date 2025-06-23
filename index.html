@@ -50,7 +50,7 @@ if [[ $# -eq 0 ]]; then
   lang="default" #en # Agar eksekusi cepat
 fi
 for arg in "$@"; do
-  case $arg in
+  case "$arg" in
     --debug)
       DEBUG=1
       lang="default" # Harus
