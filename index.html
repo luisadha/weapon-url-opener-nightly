@@ -34,7 +34,7 @@ touch "$CACHE"
 mkdir -p "$BASE"
 debug_log() {  
   if [ "$DEBUG" -eq 1 ]; then  
-    printf "[DEBUG] " "$*" >&2;
+    printf "[DEBUG] %s\n" "$*" >&2;
   fi 
 }
 normal_log() {
