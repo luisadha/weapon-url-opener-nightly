@@ -141,7 +141,7 @@ debug_log "Query detected: ${locale:="(system detection)"}\n"
 # Masuk ke folder koleksi
 debug_log "Entering dir: " && pushd ~/bin || exit
 # Tambahkan dekripsi untuk opsi Exit
-echo "$(trmap info_c)" > ~/bin/EXIT
+trmap info_c > ~/bin/EXIT
 __banner__="$(trmap banner)"
 
 # Hitung skrip provider
