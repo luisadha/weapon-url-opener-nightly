@@ -34,7 +34,7 @@ touch "$CACHE"
 mkdir -p "$BASE"
 debug_log() {  
   if [ "$DEBUG" -eq 1 ]; then  
-    printf "[DEBUG] $*" >&2;
+    printf "[DEBUG] " "$*" >&2;
   fi 
 }
 normal_log() {
@@ -122,7 +122,7 @@ declare -A map_en=(
 
 # Fungsi untuk ambil string berdasarkan key
 trmap() {
-  locale="$(cat $CACHE)";
+  locale="$(cat "$CACHE")";
   case "$locale" in
     Pengenalan) lang="id" ;;
     Speech)     lang="en" ;;
@@ -139,13 +139,13 @@ debug_log "Query detected: ${locale:="(system detection)"}\n"
 }
 
 # Masuk ke folder koleksi
-debug_log "Entering dir: " && pushd ~/bin
+debug_log "Entering dir: " && pushd ~/bin || exit
 # Tambahkan dekripsi untuk opsi Exit
 echo "$(trmap info_c)" > ~/bin/EXIT
 __banner__="$(trmap banner)"
 
 # Hitung skrip provider
-count_plugin=$(ls ~/bin/*.sh| wc -l)
+#count_plugin=$(ls ~/bin/*.sh| wc -l)
 # Hitung hash dari termux-url-opener
 ref_hash=$(md5sum ~/bin/termux-url-opener 2>/dev/null | awk '{print $1}')
 
@@ -212,12 +212,12 @@ weapon=$(printf '%s\n' "${file_list[@]}" | while read -r f; do
 
 # Jika tidak memilih apa-apa, keluar
 if [[ "$weapon" == "" ]]; then
-  echo $no_input
+  echo "$no_input"
   exit 2
 fi
 # Jika pilih EXIT
 if [[ "$weapon" == "EXIT" ]]; then
-  echo $eof
+  echo "$eof"
   exit 1
 fi
 rep="$(basename "$weapon")";
