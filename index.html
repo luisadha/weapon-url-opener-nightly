@@ -7,7 +7,7 @@
 # in the calling context.
 # Author: luisadha (c) 2025
 # Sangat cepat rata-rata 24 ms.
-VERSION="v2.3.24"
+VERSION="v2.3.25"
 
 ## 📝 Changelog - v2.2.24 (2025-06-23)
 ### Patch v2.2.24
@@ -148,7 +148,7 @@ update_system() {
 };
   
 # Masuk ke folder koleksi
-debug_log "Entering dir: " && pushd ~/bin || exit
+debug_log "Entering dir: " && pushd ~/bin &>/dev/null || exit
 # Tambahkan dekripsi untuk opsi Exit
 update_system > ~/bin/AUTO_UPDATE_YT-DLP
 trmap info_c > ~/bin/EXIT
