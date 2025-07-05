@@ -36,7 +36,7 @@ touch "$CACHE"
 mkdir -p "$BASE"
 debug_log() {  
   if [ "$DEBUG" -eq 1 ]; then  
-    printf "[DEBUG] %s" "$*" >&2;
+    echo -ne "[DEBUG] " "$*" >&2;
   fi 
 }
 normal_log() {
@@ -59,6 +59,7 @@ for arg in "$@"; do
       ;;
     --version)
       echo "weapon-url-opener-nightly $VERSION"
+      exit 0;
       ;;
     --install-plugin)
       echo -e "You will install 1 plugin (ztme-toolbox) this will be added to ~/bin after installation is complete";
