@@ -160,7 +160,7 @@ __banner__="$(trmap banner)"
 ref_hash=$(md5sum ~/bin/termux-url-opener 2>/dev/null | awk '{print $1}')
 
 # Ambil semua file .sh dalam urutan waktu
-IFS=$'\n' read -d '' -r -a file_list < <(\ls -Art ~/bin/*.sh 2>/dev/null || echo "Please install some downloader script")
+IFS=$'\n' read -d '' -r -a file_list < <(\ls -Art ~/bin/*.sh 2>/dev/null || :)
 
 # Ambil hanya nama file-nya
 IFS=$'\n' read -d '' -r -a file_list < <(printf "%s\n" "${file_list[@]}" | xargs -n1 basename)
