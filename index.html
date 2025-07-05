@@ -146,7 +146,7 @@ update_system() {
 # Masuk ke folder koleksi
 debug_log "Entering dir: " && pushd ~/bin || exit
 # Tambahkan dekripsi untuk opsi Exit
-update_system > ~/bin/UPDATE_YT-DLP
+update_system > ~/bin/AUTO_UPDATE_YT-DLP
 trmap info_c > ~/bin/EXIT
 __banner__="$(trmap banner)"
 
@@ -162,14 +162,16 @@ IFS=$'\n' read -d '' -r -a file_list < <(\ls -Art ~/bin/*.sh)
 IFS=$'\n' read -d '' -r -a file_list < <(printf "%s\n" "${file_list[@]}" | xargs -n1 basename)
 
 # Tambahkan Opsi EXIT di akhir
+
+file_list+=("AUTO_UPDATE_YT-DLP")
 file_list+=("EXIT")
-file_list+=("UPDATE_YT-DLP")
   
 # Cari file yang sedang 'in use' (hash sama dengan termux-url-opener)
 toggle=""
 for file in "${file_list[@]}"; do
   [[ "$file" == "EXIT" ]] && continue
-  [[ "$file" == "UPDATE_YT-DLP" ]] && continue
+  [[ "$file" == "AUTO_UPDATE_YT-DLP" ]] && echo "Update while start.." && continue
+
   file_hash=$(md5sum ~/bin/"$file" 2>/dev/null | awk '{print $1}')
   if [[ "$file_hash" == "$ref_hash" ]]; then
     toggle="${file%.*}";
@@ -224,10 +226,10 @@ if [[ "$weapon" == "" ]]; then
   exit 2
 fi
 # Jika pilih EXIT
-if [[ "$weapon" == "UPDATE_YT-DLP" ]]; then
-  echo "Update while loading.."
-  bash ~/bin/UPDATE_YT-DLP
-fi
+if [[ "$weapon" == "AUTO_UPDATE_YT-DLP" ]]; then
+  :
+fi;
+  
 if [[ "$weapon" == "EXIT" ]]; then
   echo "$eof"
   exit 1
