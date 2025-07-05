@@ -7,7 +7,7 @@
 # in the calling context.
 # Author: luisadha (c) 2025
 # Sangat cepat rata-rata 24 ms.
-VERSION="v2.3.25"
+VERSION="v2.3.26"
 
 ## 📝 Changelog - v2.2.24 (2025-06-23)
 ### Patch v2.2.24
@@ -36,7 +36,7 @@ touch "$CACHE"
 mkdir -p "$BASE"
 debug_log() {  
   if [ "$DEBUG" -eq 1 ]; then  
-    printf "[DEBUG] %s\n" "$*" >&2;
+    printf "[DEBUG] %s" "$*" >&2;
   fi 
 }
 normal_log() {
@@ -56,6 +56,9 @@ for arg in "$@"; do
   case "$arg" in
     --debug)
       DEBUG=1
+      ;;
+    --version)
+      echo "weapon-url-opener-nightly $VERSION"
       ;;
     --install-plugin)
       echo -e "You will install 1 plugin (ztme-toolbox) this will be added to ~/bin after installation is complete";
