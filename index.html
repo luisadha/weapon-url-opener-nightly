@@ -170,7 +170,7 @@ file_list+=("EXIT")
 toggle=""
 for file in "${file_list[@]}"; do
   [[ "$file" == "EXIT" ]] && continue
-  [[ "$file" == "AUTO_UPDATE_YT-DLP" ]] && echo "Update while start.." && continue
+  [[ "$file" == "AUTO_UPDATE_YT-DLP" ]] && continue
 
   file_hash=$(md5sum ~/bin/"$file" 2>/dev/null | awk '{print $1}')
   if [[ "$file_hash" == "$ref_hash" ]]; then
@@ -227,7 +227,7 @@ if [[ "$weapon" == "" ]]; then
 fi
 # Jika pilih EXIT
 if [[ "$weapon" == "AUTO_UPDATE_YT-DLP" ]]; then
-  :
+  exit 0
 fi;
   
 if [[ "$weapon" == "EXIT" ]]; then
