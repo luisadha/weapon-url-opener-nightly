@@ -56,8 +56,9 @@ for arg in "$@"; do
   case "$arg" in
     --debug)
       DEBUG=1
+      ;;
     --install-plugin)
-      echo -e "Kamu akan menginstall 1 plugin (ztme-toolbox) ini akan ditambahkan ke ~/bin setelah instalasi selesai"
+      echo -e "You will install 1 plugin (ztme-toolbox) this will be added to ~/bin after installation is complete";
       curl -sSL https://raw.githubusercontent.com/luisadha/weapon-url-opener/refs/heads/master/install-plugin.sh | bash
       ;;
     --lang=*)
