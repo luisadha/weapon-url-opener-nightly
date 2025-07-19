@@ -54,6 +54,17 @@ fi
 
 for arg in "$@"; do
   case "$arg" in
+    --help)
+  cat <<'EOF'
+  WUO-Nightly  Switch downloader scripts easily and quickly. Now you can use the termux-url-opener feature more often.
+  Usage :
+        --debug              Print debug/verbose.         
+        --install-plugin     Install recomendations any like termux-url-opener script
+        --lang=[auto/en/id]  Change languages.
+        --version            Print version.
+        --help               Print this message.
+    EOF
+      ;;
     --debug)
       DEBUG=1
       ;;
@@ -62,7 +73,7 @@ for arg in "$@"; do
       exit 0;
       ;;
     --install-plugin)
-      echo -e "You will install 1 plugin (ztme-toolbox) this will be added to ~/bin after installation is complete";
+      echo -e "You will install 2 plugin for (Fist-installations) this will be added to ~/bin after installation are complete";
       curl -sSL https://raw.githubusercontent.com/luisadha/weapon-url-opener/refs/heads/master/install-plugin.sh | bash
       ;;
     --lang=*)
