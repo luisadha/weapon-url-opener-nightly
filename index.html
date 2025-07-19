@@ -55,15 +55,15 @@ fi
 for arg in "$@"; do
   case "$arg" in
     --help)
-  cat <<'EOF'
-  WUO-Nightly  Switch downloader scripts easily and quickly. Now you can use the termux-url-opener feature more often.
-  Usage :
+cat <<'EOF'
+WUO-Nightly  Switch downloader scripts easily and quickly. Now you can use the termux-url-opener feature more often.
+Usage :
         --debug              Print debug/verbose.         
         --install-plugin     Install recomendations any like termux-url-opener script
         --lang=[auto/en/id]  Change languages.
         --version            Print version.
         --help               Print this message.
-    EOF
+EOF
       ;;
     --debug)
       DEBUG=1
