@@ -158,11 +158,40 @@ debug_log "Query detected: ${locale:="(system detection)"}\n"
 update_system() {
   pip install -U yt-dlp;
 };
-  
+patch_all_handler_termux_url_opener() {
+# Tambal semua file .sh di ~/bin dengan string "weapon-url-opener-nightly"
+
+PATCH_LINE='weapon-url-opener-nightly'
+
+find ~/bin -type f -name "*.sh" | while read -r file; do
+  # Cek apakah sudah ditambal
+  grep -Fxq "$PATCH_LINE" "$file" && continue
+
+  # Persiapkan buffer sementara
+  tmpfile=$(mktemp)
+
+  awk -v patch="$PATCH_LINE" '
+    BEGIN { inserted = 0 }
+    NR == 1 && /^#!/ { print; next }
+    !inserted && /^#!/ { print; next }
+    !inserted && /^#.*[Cc]redit/ { print; next }
+    !inserted {
+      print patch;
+      inserted = 1
+    }
+    { print }
+  ' "$file" > "$tmpfile"
+
+  # Ganti file asli dengan versi yang sudah ditambal
+  mv "$tmpfile" "$file"
+  chmod +x "$file"
+done
+};
 # Masuk ke folder koleksi
 debug_log "Entering dir: " && pushd ~/bin &>/dev/null || exit
 # Tambahkan dekripsi untuk opsi Exit
 update_system > ~/bin/AUTO_UPDATE_YT-DLP
+patch_all_handler_termux_url_opener > ~/bin/PATCH_ALL_HANDLER_SCRIPT
 trmap info_c > ~/bin/EXIT
 __banner__="$(trmap banner)"
 
@@ -177,9 +206,10 @@ IFS=$'\n' read -d '' -r -a file_list < <(\ls -Art ~/bin/*.sh 2>/dev/null || :)
 # Ambil hanya nama file-nya
 IFS=$'\n' read -d '' -r -a file_list < <(printf "%s\n" "${file_list[@]}" | xargs -n1 basename 2>/dev/null )
 
-# Tambahkan Opsi EXIT di akhir
+# Tambahkan Opsi builtin di akhir
 
 file_list+=("AUTO_UPDATE_YT-DLP")
+file_list+=("PATCH_ALL_HANDLER_SCRIPT")
 file_list+=("EXIT")
   
 # Cari file yang sedang 'in use' (hash sama dengan termux-url-opener)
@@ -187,7 +217,9 @@ toggle=""
 for file in "${file_list[@]}"; do
   [[ "$file" == "EXIT" ]] && continue
   [[ "$file" == "AUTO_UPDATE_YT-DLP" ]] && continue
-
+  [[ "$file" == "PATCH_ALL_HANDLER_SCRIPT" ]] && continue
+# Tambahkan disini jika menambah opsi builtin baru
+  
   file_hash=$(md5sum ~/bin/"$file" 2>/dev/null | awk '{print $1}')
   if [[ "$file_hash" == "$ref_hash" ]]; then
     toggle="${file%.*}";
@@ -241,14 +273,19 @@ if [[ "$weapon" == "" ]]; then
   echo "$no_input"
   exit 2
 fi
-# Jika pilih EXIT
+# Jika memilih AUTO_UPDATE_YTDL
 if [[ "$weapon" == "AUTO_UPDATE_YT-DLP" ]]; then
-  exit 0
+  exit 0;
 fi;
-  
+# Jika memilih Menambal
+if [[ "$weapon" == "PATCH_ALL_HANDLER_SCRIPT" ]]; then
+  echo "All handler scripts patched successfully!";
+  exit 0;
+fi
+# Jika memilih Keluar
 if [[ "$weapon" == "EXIT" ]]; then
   echo "$eof"
-  exit 1
+  exit 1;
 fi
 rep="$(basename "$weapon")";
 # Jalankan aksi
