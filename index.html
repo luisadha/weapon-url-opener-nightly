@@ -9,7 +9,7 @@ ENV=~/bin/.env; touch "$ENV"; source "$ENV";
 
 # Version v2.3.30 Added: New builtin options
 CATCH_URL="$TERMUX_URL_OPENER_SHARED_DATA"
-VERSION="v2.4.0"
+VERSION="v2.4.1"
 DEBUG=0
 lang=""
 BASE="$HOME/.local/state/wuo/"
@@ -152,10 +152,12 @@ parameter_passing() {
 };
 patch_all_handler_termux_url_opener() {
 
+#!/usr/bin/env bash
+
 PATCH_ID="# PATCH_TERMUX_URL_OPENER_SHARED_DATA"
 read -r -d '' PATCH_CODE <<'EOF'
 weapon-url-opener-nightly
-export TERMUX_URL_OPENER_SHARED_DATA="$1"
+export TERMUX_URL_OPENER_SHARED_DATA="$1" # Bagian ini harus tetap $1
 env | grep "^TERMUX_URL_OPENER_SHARED_DATA=" > ~/bin/.env
 EOF
 
@@ -175,6 +177,7 @@ for file in ~/bin/*.sh; do
   inserted=0
   shebang_done=0
   credit_done=0
+  patch_lines=0
 
   while IFS= read -r line; do
     # Hormati shebang, tapi hanya sekali
@@ -190,6 +193,7 @@ for file in ~/bin/*.sh; do
       new_content+="$PATCH_ID"$'\n'"$PATCH_CODE"$'\n'
       inserted=1
       credit_done=1
+      patch_lines=$(wc -l <<< "$PATCH_CODE")
       continue
     fi
 
@@ -199,25 +203,32 @@ for file in ~/bin/*.sh; do
   # Jika tidak ada credit dan belum insert
   if [[ $inserted -eq 0 ]]; then
     if [[ $shebang_done -eq 1 ]]; then
-      # Sisipkan patch setelah shebang
       IFS=$'\n' read -d '' -r -a lines <<< "$new_content"
       new_content="${lines[0]}"$'\n'"$PATCH_ID"$'\n'"$PATCH_CODE"
       for ((i=1; i<${#lines[@]}; i++)); do
         new_content+=$'\n'"${lines[i]}"
       done
+      patch_lines=$(wc -l <<< "$PATCH_CODE")
     else
-      # Sisipkan patch di awal file
       new_content="$PATCH_ID"$'\n'"$PATCH_CODE"$'\n'"$new_content"
+      patch_lines=$(wc -l <<< "$PATCH_CODE")
     fi
   fi
 
-  # Ganti semua $1 dan "$1" dengan variabel patch
-  new_content="${new_content//\"\$1\"/\$TERMUX_URL_OPENER_SHARED_DATA}"
-  new_content="${new_content//\$1/\$TERMUX_URL_OPENER_SHARED_DATA}"
+  # Sekarang kita pisahkan PATCH dan bagian asli
+  patch_part=$(head -n $((patch_lines + 1)) <<< "$new_content")
+  original_part=$(tail -n +$((patch_lines + 2)) <<< "$new_content")
 
-  printf '%s' "$new_content" > "$file"
+  # Ganti semua $1 dan "$1" di bagian asli SAJA
+  original_part="${original_part//\"\$1\"/\$TERMUX_URL_OPENER_SHARED_DATA}"
+  original_part="${original_part//\$1/\$TERMUX_URL_OPENER_SHARED_DATA}"
+
+  # Gabungkan kembali
+  final_content="$patch_part"$'\n'"$original_part"
+
+  printf '%s' "$final_content" > "$file"
   echo "✅ Patch selesai di $file"
-done 
+done
 
 grep -n 'weapon-url-opener-nightly' ~/bin/*.sh 2>/dev/null --color=always > ~/bin/PATCH_ALL_HANDLER_SCRIPT
 };
