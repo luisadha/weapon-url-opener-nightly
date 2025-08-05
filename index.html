@@ -4,11 +4,12 @@
 # in the calling context.
 # Author: luisadha (c) 2025
 # Sangat cepat rata-rata 24 ms.
-VERSION="v2.3.30"
+
+ENV=~/bin/.env; touch "$ENV"; source "$ENV";
 
 # Version v2.3.30 Added: New builtin options
-CATCH_URL="$1"
-echo "$CATCH_URL"
+CATCH_URL="$TERMUX_URL_OPENER_SHARED_DATA"
+VERSION="v2.4.0"
 DEBUG=0
 lang=""
 BASE="$HOME/.local/state/wuo/"
@@ -102,6 +103,7 @@ debug_log "Detection language: $lang\n"
 
 # Map Bahasa Indonesia
 declare -A map_id=(
+  [info_t]='Gunakan ↑ ↓ untuk navigasi, Enter untuk pilih'
   [choosed_n]='Tidak memilih'
   [info_c]='Keluar dari skrip ini'
   [info_e]='Keluar'
@@ -114,6 +116,7 @@ declare -A map_id=(
 
 # Map Bahasa Inggris
 declare -A map_en=(
+  [info_t]='Use ↑↓ to navigate, Enter to select'
   [choosed_n]='Not choosed yet'
   [info_c]='Program close'
   [info_e]='Exit'
@@ -144,39 +147,85 @@ debug_log "Query detected: ${locale:="(system detection)"}\n"
 update_system() {
   pip install -U yt-dlp;
 };
+parameter_passing() {
+  echo "$CATCH_URL"
+};
 patch_all_handler_termux_url_opener() {
-# Tambal semua file .sh di ~/bin dengan string "weapon-url-opener-nightly"
 
-PATCH_LINE='weapon-url-opener-nightly'
+PATCH_ID="# PATCH_TERMUX_URL_OPENER_SHARED_DATA"
+read -r -d '' PATCH_CODE <<'EOF'
+weapon-url-opener-nightly
+export TERMUX_URL_OPENER_SHARED_DATA="$1"
+env | grep "^TERMUX_URL_OPENER_SHARED_DATA=" > ~/bin/.env
+EOF
 
-find ~/bin -type f -name "*.sh" | while read -r file; do
-  # Cek apakah sudah ditambal
-  grep -Fxq "$PATCH_LINE" "$file" && continue
+for file in ~/bin/*.sh; do
+  [ -f "$file" ] || continue
 
-  # Persiapkan buffer sementara
-  tmpfile=$(mktemp)
+  echo "🛠  Memeriksa $file ..."
+  content="$(<"$file")"
 
-  awk -v patch="$PATCH_LINE" '
-    BEGIN { inserted = 0 }
-    NR == 1 && /^#!/ { print; next }
-    !inserted && /^#!/ { print; next }
-    !inserted && /^#.*[Cc]redit/ { print; next }
-    !inserted {
-      print patch;
-      inserted = 1
-    }
-    { print }
-  ' "$file" > "$tmpfile"
+  # Lewati kalau sudah ditambal
+  if grep -qF "$PATCH_ID" <<< "$content"; then
+    echo "✅ Sudah ditambal, dilewati."
+    continue
+  fi
 
-  # Ganti file asli dengan versi yang sudah ditambal
-  mv "$tmpfile" "$file"
-  chmod +x "$file"
-done
+  new_content=""
+  inserted=0
+  shebang_done=0
+  credit_done=0
+
+  while IFS= read -r line; do
+    # Hormati shebang, tapi hanya sekali
+    if [[ $shebang_done -eq 0 && "$line" =~ ^#! ]]; then
+      new_content+="$line"$'\n'
+      shebang_done=1
+      continue
+    fi
+
+    # Hormati credit, jika ada dan belum pernah diproses
+    if [[ $credit_done -eq 0 && "$line" =~ [Cc]redit ]]; then
+      new_content+="$line"$'\n'
+      new_content+="$PATCH_ID"$'\n'"$PATCH_CODE"$'\n'
+      inserted=1
+      credit_done=1
+      continue
+    fi
+
+    new_content+="$line"$'\n'
+  done <<< "$content"
+
+  # Jika tidak ada credit dan belum insert
+  if [[ $inserted -eq 0 ]]; then
+    if [[ $shebang_done -eq 1 ]]; then
+      # Sisipkan patch setelah shebang
+      IFS=$'\n' read -d '' -r -a lines <<< "$new_content"
+      new_content="${lines[0]}"$'\n'"$PATCH_ID"$'\n'"$PATCH_CODE"
+      for ((i=1; i<${#lines[@]}; i++)); do
+        new_content+=$'\n'"${lines[i]}"
+      done
+    else
+      # Sisipkan patch di awal file
+      new_content="$PATCH_ID"$'\n'"$PATCH_CODE"$'\n'"$new_content"
+    fi
+  fi
+
+  # Ganti semua $1 dan "$1" dengan variabel patch
+  new_content="${new_content//\"\$1\"/\$TERMUX_URL_OPENER_SHARED_DATA}"
+  new_content="${new_content//\$1/\$TERMUX_URL_OPENER_SHARED_DATA}"
+
+  printf '%s' "$new_content" > "$file"
+  echo "✅ Patch selesai di $file"
+done 
+
+grep -n 'weapon-url-opener-nightly' ~/bin/*.sh 2>/dev/null --color=always > ~/bin/PATCH_ALL_HANDLER_SCRIPT
 };
 # Masuk ke folder koleksi
 debug_log "Entering dir: " && pushd ~/bin &>/dev/null || exit
 # Tambahkan dekripsi untuk opsi Exit
 update_system > ~/bin/AUTO_UPDATE_YT-DLP
+parameter_passing > ~/bin/PARAMETER_FORWARDING
 patch_all_handler_termux_url_opener > ~/bin/PATCH_ALL_HANDLER_SCRIPT
 trmap info_c > ~/bin/EXIT
 __banner__="$(trmap banner)"
@@ -195,6 +244,7 @@ IFS=$'\n' read -d '' -r -a file_list < <(printf "%s\n" "${file_list[@]}" | xargs
 # Tambahkan Opsi builtin di akhir
 
 file_list+=("AUTO_UPDATE_YT-DLP")
+file_list+=("PARAMETER_FORWARDING")
 file_list+=("PATCH_ALL_HANDLER_SCRIPT")
 file_list+=("EXIT")
   
@@ -203,6 +253,7 @@ toggle=""
 for file in "${file_list[@]}"; do
   [[ "$file" == "EXIT" ]] && continue
   [[ "$file" == "AUTO_UPDATE_YT-DLP" ]] && continue
+  [[ "$file" == "PARAMETER_FORWARDING" ]] && continue
   [[ "$file" == "PATCH_ALL_HANDLER_SCRIPT" ]] && continue
 # Tambahkan disini jika menambah opsi builtin baru
   
@@ -227,8 +278,16 @@ inuse="$(trmap toogle_u)";
 pr="$(trmap prompt_s)";
 no_input="$(trmap choosed_n)";
 eof="$(trmap info_e)";
-
+tip="$(trmap info_t)";
 # Tampilan
+
+  lines=${#file_list[@]}
+
+  binds="start:toggle-up"
+  for ((i = 1; i < lines; i++)); do
+    binds+='+toggle-up'
+  done
+
 weapon=$(printf '%s\n' "${file_list[@]}" | while read -r f; do
     base="${f%.*}"
     printf "%s\t%s\n" "$f" "$base"
@@ -236,8 +295,10 @@ weapon=$(printf '%s\n' "${file_list[@]}" | while read -r f; do
   --height=50% \
   --layout=reverse \
   --border \
+  --bind="$binds" \
+  --query="EXIT" \
   --info=inline-right \
-  --pointer='👉' \
+  --pointer='*' \
   --ellipsis='+'\
   --color=border:cyan \
   --no-separator \
@@ -247,9 +308,13 @@ weapon=$(printf '%s\n' "${file_list[@]}" | while read -r f; do
   --header-border="bold" \
   --list-border="vertical" \
   --header-first \
-  --input-label="[ $inuse $current ]"\
+  --footer="${tip}" \
+  --footer-border=sharp \
+  --input-label="[ $inuse $current ]" \
   --highlight-line \
+  --ghost="$CATCH_URL" \
   --preview='bat --color=always --style=plain --paging=never --theme OneHalfDark {1}' \
+  --preview-window='right,45%,wrap' \
   --with-nth=2 \
   --delimiter=$'\t' \
   --exit-0 | cut -f1) 
@@ -263,11 +328,15 @@ fi
 if [[ "$weapon" == "AUTO_UPDATE_YT-DLP" ]]; then
   exit 0;
 fi;
+# Jika memilih PARAMETER_FORWARDING
+if [[ "$weapon" == "PARAMETER_FORWARDING" ]]; then
+  exit 0;
+fi;
 # Jika memilih Menambal
 if [[ "$weapon" == "PATCH_ALL_HANDLER_SCRIPT" ]]; then
   echo "All handler scripts patched successfully!";
   exit 0;
-fi
+fi;
 # Jika memilih Keluar
 if [[ "$weapon" == "EXIT" ]]; then
   echo "$eof"
