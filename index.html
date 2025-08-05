@@ -4,39 +4,9 @@
 # in the calling context.
 # Author: luisadha (c) 2025
 # Sangat cepat rata-rata 24 ms.
-user_agent=$_
-run_with_curl=false
-  
+
 ENV=~/bin/.env; touch "$ENV"; source "$ENV";
 
-
-if [[ ! -t 0 ]]; then user_agent='pipe'
-echo -e "User Agent: ${user_agent}"
-echo "🧪 Terdeteksi: dijalankan via pipe (| bash)"
-  IF_PIPE='--query="EXIT"'
-    :
-elif [[ -t 0 && "${BASH_SOURCE[0]}" == "$0" ]]; then user_agent="${0}"
-echo -e "User Agent: $user_agent"
-echo "🧑 Interaktif: dijalankan langsung (via PATH)"
-    :
-elif [[ -e /proc/self/fd/63 && $(readlink /proc/self/fd/63) == pipe:* ]]; then user_agent='curl'
-echo -e "User Agent: $user_agent"
-echo "Terdeteksi: dijalankam via curl dan ubtitusi "
-    :
-elif [[ -n "${BASH_SOURCE[0]}" ]]; then user_agent='source'
-echo -e "User Agent: $(echo "$user_agent" | awk -F/ '{print $NF}')"
-echo "📦 Terdeteksi: dijalankan via source"
-cat <<"EOF"
-Error: Don't use ` source weapon-url-opener-nightly '
-EOF
-    exit 2
-fi
-
-
-
-
-
-  
 # Version v2.3.30 Added: New builtin options
 CATCH_URL="$TERMUX_URL_OPENER_SHARED_DATA"
 VERSION="v2.4.1"
@@ -260,14 +230,13 @@ for file in ~/bin/*.sh; do
   echo "✅ Patch selesai di $file"
 done
 
-grep -n 'weapon-url-opener-nightly' ~/bin/*.sh 2>/dev/null --color=always > ~/bin/PATCH_ALL_HANDLER_SCRIPT
+#grep -n 'weapon-url-opener-nightly' ~/bin/*.sh 2>/dev/null --color=always > ~/bin/PATCH_ALL_HANDLER_SCRIPT
 };
 # Masuk ke folder koleksi
 debug_log "Entering dir: " && pushd ~/bin &>/dev/null || exit
 # Tambahkan dekripsi untuk opsi Exit
 update_system > ~/bin/AUTO_UPDATE_YT-DLP
 parameter_passing > ~/bin/PARAMETER_FORWARDING
-patch_all_handler_termux_url_opener > ~/bin/PATCH_ALL_HANDLER_SCRIPT
 trmap info_c > ~/bin/EXIT
 __banner__="$(trmap banner)"
 
@@ -325,8 +294,7 @@ tip="$(trmap info_t)";
 weapon=$(printf '%s\n' "${file_list[@]}" | while read -r f; do
     base="${f%.*}"
     printf "%s\t%s\n" "$f" "$base"
-  done | fzf "${IF_PIPE:-}" \
-  --prompt="$pr " \
+  done | fzf --prompt="$pr " \
   --height=50% \
   --layout=reverse \
   --border \
@@ -367,6 +335,7 @@ if [[ "$weapon" == "PARAMETER_FORWARDING" ]]; then
 fi;
 # Jika memilih Menambal
 if [[ "$weapon" == "PATCH_ALL_HANDLER_SCRIPT" ]]; then
+  patch_all_handler_termux_url_opener > ~/bin/PATCH_ALL_HANDLER_SCRIPT
   echo "All handler scripts patched successfully!";
   exit 0;
 fi;
