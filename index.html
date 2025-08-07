@@ -9,7 +9,7 @@ ENV=~/bin/.env; touch "$ENV"; source "$ENV";
 
 # Version v2.3.30 Added: New builtin options
 CATCH_URL="${TERMUX_URL_OPENER_SHARED_DATA:-"Please share the link, and I’ll take care of the rest."}"
-VERSION="v2.4.13"
+VERSION="v2.4.16"
 DEBUG=0
 lang=""
 BASE="$HOME/.local/state/wuo/"
@@ -304,7 +304,8 @@ prompt=$(wrap "$pr" 40)
 weapon=$(printf '%s\n' "${file_list[@]}" | awk -F. '{
     with_ext = $1 
     printf "%d\t%s\t%s\n", NR, with_ext, $0
-  }' | fzf --prompt="$tip " \
+  }' | fzf --prompt=">_ " \
+  --ghost="$tip " \
   --ansi \
   --border \
   --margin=2,2,2,2 \
