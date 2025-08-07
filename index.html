@@ -8,8 +8,8 @@
 ENV=~/bin/.env; touch "$ENV"; source "$ENV";
 
 # Version v2.3.30 Added: New builtin options
-CATCH_URL="$TERMUX_URL_OPENER_SHARED_DATA"
-VERSION="v2.4.1"
+CATCH_URL="${TERMUX_URL_OPENER_SHARED_DATA:-"Please share the link, and I’ll take care of the rest."}"
+VERSION="v2.4.13"
 DEBUG=0
 lang=""
 BASE="$HOME/.local/state/wuo/"
@@ -120,7 +120,7 @@ declare -A map_en=(
   [choosed_n]='Not choosed yet'
   [info_c]='Program close'
   [info_e]='Exit'
-  [banner]='WUO is termux-url-opener provider tools'
+  [banner]='Weapon-Url-Opener-Nightly'
   [prompt_s]='Choose your main weapon:'
   [toogle_u]='In Use:'
   [choosed_y]='You choosed'
@@ -235,8 +235,10 @@ done
 # Masuk ke folder koleksi
 debug_log "Entering dir: " && pushd ~/bin &>/dev/null || exit
 # Tambahkan dekripsi untuk opsi Exit
-update_system > ~/bin/AUTO_UPDATE_YT-DLP
+
+# AUTOMATE
 parameter_passing > ~/bin/PARAMETER_FORWARDING
+ABOUT=""
 trmap info_c > ~/bin/EXIT
 __banner__="$(trmap banner)"
 
@@ -253,7 +255,7 @@ IFS=$'\n' read -d '' -r -a file_list < <(printf "%s\n" "${file_list[@]}" | xargs
 
 # Tambahkan Opsi builtin di akhir
 
-file_list+=("AUTO_UPDATE_YT-DLP")
+file_list+=("UPDATE_YT-DLP")
 file_list+=("PARAMETER_FORWARDING")
 file_list+=("PATCH_ALL_HANDLER_SCRIPT")
 file_list+=("EXIT")
@@ -262,7 +264,7 @@ file_list+=("EXIT")
 toggle=""
 for file in "${file_list[@]}"; do
   [[ "$file" == "EXIT" ]] && continue
-  [[ "$file" == "AUTO_UPDATE_YT-DLP" ]] && continue
+  [[ "$file" == "UPDATE_YT-DLP" ]] && continue
   [[ "$file" == "PARAMETER_FORWARDING" ]] && continue
   [[ "$file" == "PATCH_ALL_HANDLER_SCRIPT" ]] && continue
 # Tambahkan disini jika menambah opsi builtin baru
@@ -289,44 +291,59 @@ pr="$(trmap prompt_s)";
 no_input="$(trmap choosed_n)";
 eof="$(trmap info_e)";
 tip="$(trmap info_t)";
-# Tampilan
+list_label="Handler & Options"
+opts="${#file_list[@]}"
+wrap() {
+  echo "$1" | fold -s -w "$2"
+}
+box="${fzf_header}"
+prompt=$(wrap "$pr" 40)
 
-weapon=$(printf '%s\n' "${file_list[@]}" | while read -r f; do
-    base="${f%.*}"
-    printf "%s\t%s\n" "$f" "$base"
-  done | fzf --prompt="$pr " \
-  --height=50% \
-  --layout=reverse \
+
+weapon=$(printf '%s\n' "${file_list[@]}" | awk -F. '{
+    with_ext = $1 
+    printf "%d\t%s\t%s\n", NR, with_ext, $0
+  }' | fzf --prompt="$tip " \
+  --ansi \
   --border \
-  --info=inline-right \
-  --pointer='*' \
-  --ellipsis='+'\
-  --color=border:cyan \
-  --no-separator \
-  --header-lines=0 \
-  --input-border='sharp' \
-  --header="$fzf_header" \
-  --header-border="bold" \
-  --list-border="vertical" \
+  --margin=2,2,2,2 \
+  --padding=0,1,0,1 \
   --header-first \
-  --footer="${tip}" \
-  --footer-border=sharp \
-  --input-label="[ $inuse $current ]" \
+  --header="$box" \
+  --header-border="sharp" \
+  --header-lines-border="sharp" \
+  --height=60% \
+  --min-height=${opts}+ \
+  --layout=reverse \
+  --info=inline-right \
+  --tabstop=2 \
+  --ellipsis='+'\
+  --gap=1 \
+  --gap-line='-' \
+  --color="bg+:-1,fg:gray,fg+:white,border:cyan,spinner:0,hl:yellow,header:blue,info:green,pointer:red,marker:blue,prompt:gray,hl+:red" \
+  --no-separator \
+  --ansi --input-label="$(echo -e "\033[36m[\033[35m $inuse \033[32m$current \033[36m]\033[0m")" \
+  --track \
+  --input-border='sharp' \
+  --list-border="sharp" \
+  --list-label="$(echo -e "\033[36m[ \033[35m${list_label} \033[36m]\033[0m")" \
+  --list-label-pos=0 \
   --highlight-line \
-  --ghost="$CATCH_URL" \
-  --preview='bat --color=always --style=plain --paging=never --theme OneHalfDark {1}' \
+  --preview='bat --color=always --style=plain --paging=never --theme OneHalfDark {3}' \
   --preview-window='right,45%,wrap' \
-  --with-nth=2 \
+  --with-nth=1,2 \
   --delimiter=$'\t' \
-  --exit-0 | cut -f1) 
-
+  --exit-0 | cut -f3) 
+ 
 # Jika tidak memilih apa-apa, keluar
 if [[ "$weapon" == "" ]]; then
   echo "$no_input"
   exit 2
 fi
 # Jika memilih AUTO_UPDATE_YTDL
-if [[ "$weapon" == "AUTO_UPDATE_YT-DLP" ]]; then
+if [[ "$weapon" == "UPDATE_YT-DLP" ]]; then
+  update_system > ~/bin/UPDATE_YT-DLP 2>&1;
+  echo "$(cat ~/bin/AUTO_UPDATE_YT-DLP)"
   exit 0;
 fi;
 # Jika memilih PARAMETER_FORWARDING
@@ -335,7 +352,7 @@ if [[ "$weapon" == "PARAMETER_FORWARDING" ]]; then
 fi;
 # Jika memilih Menambal
 if [[ "$weapon" == "PATCH_ALL_HANDLER_SCRIPT" ]]; then
-  patch_all_handler_termux_url_opener > ~/bin/PATCH_ALL_HANDLER_SCRIPT
+  patch_all_handler_termux_url_opener > ~/bin/PATCH_ALL_HANDLER_SCRIPT 2>&1;
   echo "All handler scripts patched successfully!";
   exit 0;
 fi;
