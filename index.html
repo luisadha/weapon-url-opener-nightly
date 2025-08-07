@@ -156,7 +156,9 @@ patch_all_handler_termux_url_opener() {
 
 PATCH_ID="# PATCH_TERMUX_URL_OPENER_SHARED_DATA"
 read -r -d '' PATCH_CODE <<'EOF'
+[ "$(md5sum "$0" | awk '{print $1}')" = "$(md5sum ~/bin/termux-url-opener | awk '{print $1}')" ] && echo "Initializing.." || exec ~/bin/termux-url-opener "$1"
 weapon-url-opener-nightly
+[ "$(md5sum "$0" | awk '{print $1}')" = "$(md5sum ~/bin/termux-url-opener | awk '{print $1}')" ] && echo "Initializing.." || exec ~/bin/termux-url-opener "$1"
 export TERMUX_URL_OPENER_SHARED_DATA="$1" # Bagian ini harus tetap $1
 env | grep "^TERMUX_URL_OPENER_SHARED_DATA=" > ~/bin/.env
 EOF
