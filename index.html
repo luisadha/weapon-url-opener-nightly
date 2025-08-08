@@ -152,7 +152,7 @@ parameter_passing() {
 };
 patch_all_handler_termux_url_opener() {
 
-PATCH_ID="#!/data/data/com.termux/files/usr/bin/bash"
+PATCH_ID="# PATCH by Weapon-Url-Opener-Nightly"
 read -r -d '' PATCH_CODE <<'EOF'
 export TERMUX_URL_OPENER_SHARED_DATA="$1" # Bagian ini harus tetap $1
 env | grep "^TERMUX_URL_OPENER_SHARED_DATA=" > ~/bin/.env
