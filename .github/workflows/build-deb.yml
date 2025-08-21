@@ -55,7 +55,7 @@ jobs:
           Maintainer: Luis Adha <adharudin14@gmail.com>
           Description: ${{ env.DESCRIPTION }}
           Priority: optional
-          Section: games
+          Section: utils
           EOF
 
       - name: Build .deb
