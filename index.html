@@ -341,7 +341,7 @@ weapon=$(printf '%s\n' "${file_list[@]}" | awk -F. '{
 # Jika tidak memilih apa-apa, keluar
 if [[ "$weapon" == "" ]]; then
   echo "$no_input"
-  exit 2
+  exit 0;
 fi
 # Jika memilih AUTO_UPDATE_YTDL
 if [[ "$weapon" == "UPDATE_YT-DLP" ]]; then
