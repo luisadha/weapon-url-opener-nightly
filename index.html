@@ -151,7 +151,7 @@ parameter_passing() {
   echo "$CATCH_URL"
 };
 patch_all_handler_termux_url_opener() {
-
+IGNORE_FILE="~/bin/.ignore"
 PATCH_ID="# PATCH by Weapon-Url-Opener-Nightly"
 read -r -d '' PATCH_CODE <<'EOF'
 export TERMUX_URL_OPENER_SHARED_DATA="$1" # Bagian ini harus tetap $1
@@ -166,6 +166,22 @@ EOF
 for file in ~/bin/*.sh; do
   [ -f "$file" ] || continue
 
+skip_file=0
+if [ -f "$IGNORE_FILE" ]; then
+  while IFS= read -r pattern; do
+    [[ -z "$pattern" || "$pattern" =~ ^# ]] && continue  # lewati kosong/komentar
+    if [[ "$(basename "$file")" == $pattern ]]; then
+      skip_file=1
+      break
+    fi
+  done < "$IGNORE_FILE"
+fi
+
+if (( skip_file )); then
+  echo "🚫 Melewati $file (match pola .ignore: $pattern)"
+  continue
+fi
+  
   echo "🛠  Memeriksa $file ..."
   content="$(<"$file")"
 
