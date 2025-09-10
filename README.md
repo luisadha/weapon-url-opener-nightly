@@ -1,4 +1,4 @@
-# weapon-url-opener-nightly
+# weapon-url-opener-nightly  formerly just weapon-url-opener
 
 # Whats new
 * Improvement:
@@ -9,5 +9,6 @@
 * Update YT-DlP Quickly
 * Best choice replace termux-url-opener with PATCH feature
 * Localizations: en/id
+* Respect  ingnoring  files  using  .ignore  and  .gitignore (v2.5.1)
 
   
