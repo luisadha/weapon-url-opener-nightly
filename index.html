@@ -151,7 +151,8 @@ parameter_passing() {
   echo "$CATCH_URL"
 };
 patch_all_handler_termux_url_opener() {
-IGNORE_FILE="~/bin/.ignore"
+set -xv
+  IGNORE_FILE="${IGNORE_FILE:-~/bin/.ignore}"
 PATCH_ID="# PATCH by Weapon-Url-Opener-Nightly"
 read -r -d '' PATCH_CODE <<'EOF'
 export TERMUX_URL_OPENER_SHARED_DATA="$1" # Bagian ini harus tetap $1
@@ -163,29 +164,18 @@ weapon-url-opener-nightly
 [ "$(md5sum "$0" | awk '{print $1}')" = "$(md5sum ~/bin/termux-url-opener | awk '{print $1}')" ] && echo "Initializing.." || exec ~/bin/termux-url-opener "$CATCH_URL"
 EOF
 
-for file in ~/bin/*.sh; do
+
+
+IFS=$'\n' read -d '' -r -a ignoring < <(ls -Art ~/bin/*.sh | grep -v -f $IGNORE_FILE)
+IFS=$'\n' read -d '' -r -a ignoring < <(printf "%s\n" "${ignoring[@]}" | xargs -n1 basename)
+
+for file in "${ignoring[@]}"; do
   [ -f "$file" ] || continue
 
-skip_file=0
-if [ -f "$IGNORE_FILE" ]; then
-  while IFS= read -r pattern; do
-    [[ -z "$pattern" || "$pattern" =~ ^# ]] && continue  # lewati kosong/komentar
-    if [[ "$(basename "$file")" == $pattern ]]; then
-      skip_file=1
-      break
-    fi
-  done < "$IGNORE_FILE"
-fi
-
-if (( skip_file )); then
-  echo "🚫 Melewati $file (match pola .ignore: $pattern)"
-  continue
-fi
   
   echo "🛠  Memeriksa $file ..."
   content="$(<"$file")"
 
-  # Lewati kalau sudah ditambal
   if grep -qF "$PATCH_ID" <<< "$content"; then
     echo "✅ Sudah ditambal, dilewati."
     continue
@@ -246,8 +236,9 @@ fi
 
   printf '%s' "$final_content" > "$file"
   echo "✅ Patch selesai di $file"
-done
+done 
 
+set +xv
 #grep -n 'weapon-url-opener-nightly' ~/bin/*.sh 2>/dev/null --color=always > ~/bin/PATCH_ALL_HANDLER_SCRIPT
 };
 # Masuk ke folder koleksi
@@ -371,7 +362,7 @@ if [[ "$weapon" == "PARAMETER_FORWARDING" ]]; then
 fi;
 # Jika memilih Menambal
 if [[ "$weapon" == "PATCH_ALL_HANDLER_SCRIPT" ]]; then
-  patch_all_handler_termux_url_opener > ~/bin/PATCH_ALL_HANDLER_SCRIPT 2>&1;
+  patch_all_handler_termux_url_opener > ~/bin/PATCH_ALL_HANDLER_SCRIPT #2>&1;
   echo "All handler scripts patched successfully!";
   exit 0;
 fi;
