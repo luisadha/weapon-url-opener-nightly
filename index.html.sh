@@ -152,7 +152,8 @@ parameter_passing() {
 };
 patch_all_handler_termux_url_opener() {
 set -xv
-  IGNORE_FILE="${IGNORE_FILE:-$HOME/bin/.ignore}"
+touch $HOME/bin/.ignore
+IGNORE_FILE="${IGNORE_FILE:-$HOME/bin/.ignore}"
 PATCH_ID="# PATCH by Weapon-Url-Opener-Nightly"
 read -r -d '' PATCH_CODE <<'EOF'
 export TERMUX_URL_OPENER_SHARED_DATA="$1" # Bagian ini harus tetap $1
@@ -167,7 +168,7 @@ EOF
 
 
 IFS=$'\n' read -d '' -r -a ignoring < <(ls -Art ~/bin/*.sh | grep -v -f "$IGNORE_FILE")
-IFS=$'\n' read -d '' -r -a ignoring < <(printf "%s\n" "${ignoring[@]}" | xargs -n1 basename)
+IFS=$'\n' read -d '' -r -a ignoring < <(printf "%s\n" "${ignoring[@]}" | xargs -n1 -r basename)
 
 for file in "${ignoring[@]}"; do
   [ -f "$file" ] || continue
