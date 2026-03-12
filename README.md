@@ -11,4 +11,13 @@
 * Localizations: en/id
 * Respect  ingnoring  files  using  .ignore  and  .gitignore (v2.5.1)
 
-  
+## Usage
+```sh
+WUO-Nightly  Switch downloader scripts easily and quickly. Now you can use the termux-url-opener feature more often.
+Usage :
+        --debug              Print debug/verbose      
+        --install-plugin     Install the termux-url-opener add-on required for this tool to work
+        --lang=[auto/en/id]  Change languages
+        --version            Print version
+        --help               Print this message
+```
